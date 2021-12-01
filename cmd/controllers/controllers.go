@@ -38,14 +38,15 @@ func (h *Home) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Link) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	service := services.NewLink(l.db, r)
 	resp, err := service.LinkExecute()
 	js, errJson := json.Marshal(resp)
 	if errJson != nil {
 		log.Fatalln(errJson)
 	}
+
 	w.WriteHeader(resp.Code)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if _, errWrite := w.Write(js); err != nil {
 		log.Fatalln(errWrite)
