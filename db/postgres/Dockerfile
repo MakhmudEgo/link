@@ -1,6 +1,6 @@
 FROM postgres:14.1
 
-#COPY sql/* /docker-entrypoint-initdb.d/
+COPY sql/* /docker-entrypoint-initdb.d/
 
 EXPOSE 5432
 

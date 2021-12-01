@@ -1,8 +1,10 @@
 package controllers
 
 import (
-	"context"
+	"encoding/json"
 	"log"
+	"main/cmd/models"
+	"main/cmd/services"
 	"net/http"
 )
 
@@ -11,25 +13,46 @@ import (
 }*/
 
 type Home struct {
-	ctx context.Context
+	db *models.Database
+}
+
+func (h *Home) name() {
+
+}
+
+func NewHome(db *models.Database) *Home {
+	return &Home{db: db}
 }
 
 type Link struct {
+	db *models.Database
+}
+
+func NewLink(db *models.Database) *Link {
+	return &Link{db: db}
 }
 
 func (h *Home) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.ctx = context.Background()
+	//http.Redirect(w, r, "https://yandex.ru", http.StatusTemporaryRedirect)
+
 }
 
 func (l *Link) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet && r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
+	service := services.NewLink(l.db, r)
+	resp, err := service.LinkExecute()
+	js, errJson := json.Marshal(resp)
+	if errJson != nil {
+		log.Fatalln(errJson)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	_, err := w.Write([]byte(`{"kek": "LOL"}`))
+	w.WriteHeader(resp.Code)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+
+	if _, errWrite := w.Write(js); err != nil {
+		log.Fatalln(errWrite)
+	}
+
 	if err != nil {
 		log.Fatalln(err)
 	}
-	//http.Redirect(w, r, "https://yandex.ru", http.StatusTemporaryRedirect)
+
 }

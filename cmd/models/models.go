@@ -12,8 +12,7 @@ import (
 type IModels interface {
 	Select() error
 	Connect() error
-	Create()
-	Check()
+	Close()
 }
 
 type Link struct {
@@ -22,14 +21,14 @@ type Link struct {
 }
 
 type Database struct {
-	typeBD int
-	rdb    *redis.Client
-	pst    *pgx.Conn
-	ctx    context.Context
+	TypeDB int
+	Rdb    *redis.Client
+	Pst    *pgx.Conn
+	Ctx    context.Context
 }
 
 func NewDatabase(typeBD int) *Database {
-	return &Database{typeBD: typeBD, ctx: context.Background()}
+	return &Database{TypeDB: typeBD, Ctx: context.Background()}
 }
 
 func (db *Database) Connect() error {
@@ -41,20 +40,20 @@ func (db *Database) Connect() error {
 
 func (db *Database) Select() error {
 	var err error
-	switch db.typeBD {
+	switch db.TypeDB {
 	case utils.PostgresDB:
-		db.pst, err = pgx.Connect(db.ctx, os.Getenv("DATABASE_URL"))
+		db.Pst, err = pgx.Connect(db.Ctx, os.Getenv("DATABASE_URL"))
 		if err != nil {
 			return err
 		} else {
 			log.Println("postgres success")
 		}
 	case utils.RedisDB:
-		db.rdb = redis.NewClient(&redis.Options{
+		db.Rdb = redis.NewClient(&redis.Options{
 			Addr:     os.Getenv("REDIS_ADDR"),
 			Password: os.Getenv("REDIS_PASSWORD"),
 		})
-		err = db.rdb.Set(db.ctx, "key", "value", 0).Err()
+		err = db.Rdb.Set(db.Ctx, "key", "value", 0).Err()
 		if err != nil {
 			return err
 		} else {
@@ -63,4 +62,13 @@ func (db *Database) Select() error {
 
 	}
 	return nil
+}
+
+func (db *Database) Close() {
+	if db.TypeDB != utils.PostgresDB {
+		return
+	}
+	if err := db.Pst.Close(db.Ctx); err != nil {
+		log.Fatalln(err)
+	}
 }

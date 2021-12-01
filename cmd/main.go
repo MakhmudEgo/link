@@ -7,6 +7,7 @@ import (
 	"main/cmd/models"
 	"main/cmd/utils"
 	"net/http"
+	"os"
 )
 
 func init() {
@@ -25,9 +26,13 @@ func main() {
 	if err := db.Connect(); err != nil {
 		log.Fatalln(err)
 	}
+	if typeDB == utils.PostgresDB {
+		defer db.Close()
+	}
 
-	http.Handle("/", &controllers.Home{})
-	http.Handle("/link", &controllers.Link{})
+	// endpoints
+	http.Handle("/", controllers.NewHome(db))
+	http.Handle("/link", controllers.NewLink(db))
 
-	log.Fatalln(http.ListenAndServe(":8080", nil))
+	log.Fatalln(http.ListenAndServe(os.Getenv("SERVER_PORT"), nil))
 }
