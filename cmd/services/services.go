@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-type IServices interface {
+/*type IServices interface {
 	Select(string) (*models.Link, error)
-	//Create(string) (*models.Link, error)
-}
+	Create(string) (*models.Link, error)
+}*/
 
 type Response struct {
 	Code        int    `json:"-"`
@@ -31,7 +31,6 @@ type Link struct {
 	rsp        *Response
 	SERVER_URL string
 }
-
 
 type URL struct {
 	Url string `json:"url"`

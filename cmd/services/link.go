@@ -129,7 +129,7 @@ func (l *Link) Create(url string) (*models.Link, error) {
 		if err != nil {
 			return link, err
 		}
-		err = l.db.Rdb.Set(l.db.Ctx, short,url, 0).Err()
+		err = l.db.Rdb.Set(l.db.Ctx, short, url, 0).Err()
 	}
 	link.Short = short
 
@@ -157,6 +157,7 @@ func NewLink(db *models.Database, r *http.Request, SERVER_URL string) *Link {
 }
 
 func (l *Link) IsCorrectRequest(url *URL) bool {
+	defer l.r.Body.Close()
 	if err := json.NewDecoder(l.r.Body).Decode(&url); err != nil {
 		l.rsp.Error = true
 		if err.Error() == "EOF" {
