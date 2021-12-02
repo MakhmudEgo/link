@@ -1,21 +1,23 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/go-redis/redis/v8"
+	"github.com/jackc/pgx/v4"
 	"log"
 	"main/cmd/models"
+	"main/cmd/utils"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 )
 
 type IServices interface {
-	Check() (bool, error)
-	Create() error
+	Select(string) (*models.Link, error)
+	Insert(string) (*models.Link, error)
+	Create(string) (*models.Link, error)
 }
-
-var SERVER = os.Getenv("SERVER_NAME") + os.Getenv("SERVER_PORT")
 
 type Response struct {
 	Code        int    `json:"-"`
@@ -25,9 +27,10 @@ type Response struct {
 }
 
 type Link struct {
-	db  *models.Database
-	r   *http.Request
-	rsp *Response
+	db         *models.Database
+	r          *http.Request
+	rsp        *Response
+	SERVER_URL string
 }
 
 type URL struct {
@@ -46,13 +49,13 @@ func (l *Link) LinkExecute() (*Response, error) {
 	case http.MethodPost:
 		l.Post()
 	case http.MethodGet:
-
+		l.Get()
 	}
 	return l.rsp, nil
 }
 
 func (l *Link) Get() {
-
+	l.rsp.Code = http.StatusTeapot
 }
 
 func (l *Link) Post() {
@@ -75,19 +78,65 @@ func (l *Link) Post() {
 		return
 	}
 	// tmp
-	l.rsp.Code = http.StatusCreated
-	l.rsp.Url = url.Url
+	res, err := l.Select(url.Url)
+	if err != pgx.ErrNoRows && err != redis.Nil && err != nil {
+		log.Println(err)
+		l.rsp.Code = http.StatusInternalServerError
+		l.rsp.Description = "Internal Server Error"
+	} else if err != nil {
+		l.rsp.Code = http.StatusCreated
+		res, _ = l.Create(url.Url) //err
+		l.rsp.Description = "Created"
+	} else {
+		l.rsp.Code = http.StatusOK
+		l.rsp.Description = "Success"
+	}
+	l.rsp.Url = res.Short
 	l.rsp.Error = false
-	l.rsp.Description = "Success"
+
 	log.Println(l.r.Host)
 }
 
-func (l *Link) Check() (*Response, error) {
-	return nil, nil
+func (l *Link) Create(url string) (*models.Link, error) {
+	link := &models.Link{}
+	link.Base = url
+	var err error
+	short := l.SERVER_URL + GenerateRandString(10)
+	switch l.db.TypeDB {
+	case utils.PostgresDB:
+		for err = l.db.Pst.QueryRow(
+			context.Background(),
+			"insert into link(base, short) values ($1, $2)",
+			url, short).Scan(); err != pgx.ErrNoRows; {
+			short = l.SERVER_URL + GenerateRandString(10)
+		}
+
+		link.Short = short
+
+	case utils.RedisDB:
+		//link.Short, err = l.db.Rdb.Get(l.db.Ctx, url).Result()
+	}
+	return link, err
 }
 
-func NewLink(db *models.Database, r *http.Request) *Link {
-	return &Link{db: db, r: r, rsp: &Response{}}
+func (l *Link) Select(url string) (*models.Link, error) {
+	link := &models.Link{}
+	link.Base = url
+	var err error
+	switch l.db.TypeDB {
+	case utils.PostgresDB:
+		err = l.db.Pst.QueryRow(
+			context.Background(),
+			"select short from link where base=$1",
+			url).Scan(&link.Short)
+	case utils.RedisDB:
+		link.Short, err = l.db.Rdb.Get(l.db.Ctx, url).Result()
+	}
+	return link, err
+}
+
+func NewLink(db *models.Database, r *http.Request, SERVER_URL string) *Link {
+	return &Link{db: db, r: r, rsp: &Response{}, SERVER_URL: SERVER_URL}
 }
 
 // GenerateRandString – генератор строки из случайных символов(букв, чисел и _), len – длина строки

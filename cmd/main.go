@@ -17,6 +17,7 @@ func init() {
 }
 
 func main() {
+	SERVER_URL := os.Getenv("SERVER_URL")
 	parse := utils.Parse{}
 	typeDB, err := parse.Args()
 	if err != nil {
@@ -31,8 +32,8 @@ func main() {
 	}
 
 	// endpoints
-	http.Handle("/", controllers.NewHome(db))
-	http.Handle("/link", controllers.NewLink(db))
+	http.Handle("/", controllers.NewHome(db, SERVER_URL))
+	http.Handle("/link", controllers.NewLink(db, SERVER_URL))
 
 	log.Fatalln(http.ListenAndServe(os.Getenv("SERVER_PORT"), nil))
 }

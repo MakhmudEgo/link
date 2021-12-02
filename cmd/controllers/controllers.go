@@ -13,33 +13,39 @@ import (
 }*/
 
 type Home struct {
-	db *models.Database
-}
-
-func (h *Home) name() {
-
-}
-
-func NewHome(db *models.Database) *Home {
-	return &Home{db: db}
+	db         *models.Database
+	SERVER_URL string
 }
 
 type Link struct {
-	db *models.Database
+	db         *models.Database
+	SERVER_URL string
 }
 
-func NewLink(db *models.Database) *Link {
-	return &Link{db: db}
+func NewHome(db *models.Database, SERVER_URL string) *Home {
+	return &Home{db: db, SERVER_URL: SERVER_URL}
+}
+
+func NewLink(db *models.Database, SERVER_URL string) *Link {
+	return &Link{db: db, SERVER_URL: SERVER_URL}
 }
 
 func (h *Home) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusTeapot)
+	w.Write([]byte(`<h1 style="
+			display: flex;
+			align-items: center; 
+			justify-content: center; 
+			height: 100%; 
+			font-size: 150px;
+		">☕️</h1>`))
 	//http.Redirect(w, r, "https://yandex.ru", http.StatusTemporaryRedirect)
 
 }
 
 func (l *Link) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	service := services.NewLink(l.db, r)
+	service := services.NewLink(l.db, r, l.SERVER_URL)
 	resp, err := service.LinkExecute()
 	js, errJson := json.Marshal(resp)
 	if errJson != nil {
