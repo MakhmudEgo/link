@@ -31,16 +31,16 @@ func NewLink(db *models.Database, SERVER_URL string) *Link {
 }
 
 func (h *Home) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusTeapot)
-	w.Write([]byte(`<h1 style="
-			display: flex;
-			align-items: center; 
-			justify-content: center; 
-			height: 100%; 
-			font-size: 150px;
-		">☕️</h1>`))
-	//http.Redirect(w, r, "https://yandex.ru", http.StatusTemporaryRedirect)
-
+	service := services.NewHome(h.db, r, h.SERVER_URL)
+	url, code, err := service.HomeExecute()
+	if err != nil {
+		w.WriteHeader(code)
+		if _, err = w.Write([]byte(err.Error())); err != nil {
+			log.Fatalln(err)
+		}
+		return
+	}
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func (l *Link) ServeHTTP(w http.ResponseWriter, r *http.Request) {
