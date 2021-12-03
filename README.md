@@ -10,13 +10,13 @@
 
 # API:
 ##### 	http://localhost:8080/link
-##Примеры запросов:
-###POST http://localhost:8080/link
-###body
+## Примеры запросов:
+### POST http://localhost:8080/link
+### body
 		{
 			"url": "https://ozon.dev/internship"
 		}
-##Примеры ответов:
+## Примеры ответов:
 		{
 			"url": "http://localhost:8080/XxXXxXXxXX",
 			"error": false,
@@ -35,12 +35,12 @@
 			"description": "Server URL Are Not Supported"
 		}
 
-###GET http://localhost:8080/link
-###body
+### GET http://localhost:8080/link
+### body
 		{
 			"url": "http://localhost:8080/xxxxxxxxxX"
 		}
-##Примеры ответов:
+## Примеры ответов:
 		{
 			"url": "https://ozon.dev/internship",
 			"error": false,
