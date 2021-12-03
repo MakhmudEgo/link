@@ -19,8 +19,10 @@ type Parse struct {
 }
 
 func (p Parse) Args() (int, error) {
-	if len(os.Args) != 2 {
+	if len(os.Args) > 2 {
 		return BadDB, errors.New("to many arguments")
+	} else if len(os.Args) < 2 {
+		return BadDB, errors.New("no argument")
 	} else if os.Args[1] == "redis" {
 		return RedisDB, nil
 	} else if os.Args[1] == "postgres" {

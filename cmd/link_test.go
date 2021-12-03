@@ -18,6 +18,13 @@ import (
 	"testing"
 )
 
+type Rsp struct {
+	data    []byte
+	rspCode int
+	url     string
+	rspUrl  string
+}
+
 func init() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalln("No .env file found")
@@ -42,19 +49,7 @@ func TestHome(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if resp.StatusCode != http.StatusNotFound {
-		t.Error("StatusNotFound")
-	}
-	println(svr.URL)
-	println(resp.StatusCode)
-
-}
-
-type Rsp struct {
-	data    []byte
-	rspCode int
-	url     string
-	rspUrl  string
+	assert.Equal(t, resp.StatusCode, http.StatusNotFound)
 }
 
 func NewRspWithDataPost() []Rsp {

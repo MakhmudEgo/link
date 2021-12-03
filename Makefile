@@ -1,11 +1,19 @@
+
+runPostgres: postgres
+	./db.sh postgres
+	docker-compose up --build link
+
+runRedis: redis
+	./db.sh redis
+	docker-compose up --build link
+
 postgres:
-	docker-compose up --build postgres
+	docker-compose up --build -d postgres
+
 redis:
-	docker-compose up --build redis
+	docker-compose up --build -d redis
 
 stop:
 	docker-compose down
-kek:
-	docker-compose up --build
 
-.PHONY: postgres redis stop kek
+.PHONY: postgres redis stop runPostgres runRedis
