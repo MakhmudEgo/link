@@ -1,6 +1,6 @@
 # Link
 #### Укоротитель ссылок, предоставляет API к созданию коротких ссылок.
-# Запуск:
+## Запуск:
 #### Cервис работает на postgres или redis
 ## postgres:
 		make runPostgres
@@ -8,7 +8,7 @@
 		make runRedis
 
 
-# API:
+## API:
 ##### 	http://localhost:8080/link
 ## Примеры запросов:
 ### POST http://localhost:8080/link
