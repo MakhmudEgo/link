@@ -34,7 +34,7 @@ func init() {
 func TestHome(t *testing.T) {
 	SERVER_URL := os.Getenv("SERVER_URL")
 
-	db := models.NewDatabase(0)
+	db := models.NewDatabase(utils.PostgresDB)
 	if err := db.Connect(); err != nil {
 		log.Fatalln(err)
 	}
@@ -137,6 +137,67 @@ func TestLinkGetPostgres(t *testing.T) {
 
 	}
 
-	//for _, rsp := range dataGet {
-	//}
+	for _, rsp := range dataGet {
+		if rsp.rspCode != http.StatusOK && rsp.rspCode != http.StatusCreated {
+			continue
+		}
+
+		req, err := http.NewRequest("GET", svr.URL, bytes.NewBuffer([]byte(`{"url": `+`"`+rsp.rspUrl+`"}`)))
+		if err != nil {
+			t.Error(err)
+		}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Error(err)
+		}
+
+		url := services.URL{}
+		err = json.NewDecoder(resp.Body).Decode(&url)
+		if err != nil {
+			t.Error(err)
+		}
+
+		assert.Equal(t, rsp.url, url.Url)
+	}
+}
+
+var methods = []string{
+	"PUT",
+	"PATCH",
+	"DELETE",
+	"HEAD",
+	"PATCH",
+	"LINK",
+	"UNLOCK",
+	"COPY",
+}
+
+func TestLinkOtherMethods(t *testing.T) {
+	SERVER_URL := os.Getenv("SERVER_URL")
+
+	db := models.NewDatabase(utils.PostgresDB)
+	if err := db.Connect(); err != nil {
+		log.Fatalln(err)
+	}
+	err := db.Pst.QueryRow(context.Background(), "DELETE FROM link").Scan()
+	if err != nil && err != pgx.ErrNoRows {
+		t.Error(err)
+	}
+	svr := httptest.NewServer(controllers.NewLink(db, SERVER_URL))
+	defer svr.Close()
+	client := http.Client{}
+	for _, m := range methods {
+		req, err := http.NewRequest(m, svr.URL, nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Error(err)
+		}
+
+		assert.Equal(t, resp.StatusCode, http.StatusMethodNotAllowed)
+	}
 }

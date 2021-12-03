@@ -53,6 +53,7 @@ func (db *Database) Select() error {
 			Addr:     os.Getenv("REDIS_ADDR"),
 			Password: os.Getenv("REDIS_PASSWORD"),
 		})
+		// for debug
 		err = db.Rdb.Set(db.Ctx, "key", "value", 0).Err()
 		if err != nil {
 			return err
