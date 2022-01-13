@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"link/pkg/models"
+	"link/pkg/services"
 	"log"
-	"main/cmd/models"
-	"main/cmd/services"
 	"net/http"
 )
 

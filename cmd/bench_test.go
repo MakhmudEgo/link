@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/joho/godotenv"
 	"log"
-	"main/cmd/controllers"
-	"main/cmd/models"
+	"main/pkg/controllers"
+	"main/pkg/models"
 	"net/http"
 	"net/http/httptest"
 	"os"

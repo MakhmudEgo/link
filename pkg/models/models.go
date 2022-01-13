@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v4"
+	"link/internal/pkg/utils"
 	"log"
-	"main/cmd/utils"
 	"os"
 )
 

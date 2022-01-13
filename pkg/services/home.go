@@ -5,9 +5,9 @@ import (
 	"errors"
 	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v4"
+	"link/internal/pkg/utils"
+	"link/pkg/models"
 	"log"
-	"main/cmd/models"
-	"main/cmd/utils"
 	"net/http"
 )
 

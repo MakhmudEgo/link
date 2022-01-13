@@ -14,7 +14,7 @@
 ### POST http://localhost:8080/link
 ### body
 		{
-			"url": "https://ozon.dev/internship"
+			"url": "https://nissan.com"
 		}
 ## Примеры ответов:
 		{
@@ -42,7 +42,7 @@
 		}
 ## Примеры ответов:
 		{
-			"url": "https://ozon.dev/internship",
+			"url": "https://nissan.com",
 			"error": false,
 			"description": "Success"
 		}

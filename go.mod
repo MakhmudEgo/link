@@ -1,4 +1,4 @@
-module main
+module link
 
 go 1.16
 

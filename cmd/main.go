@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/joho/godotenv"
+	"link/internal/pkg/utils"
+	"link/pkg/controllers"
+	"link/pkg/models"
 	"log"
-	"main/cmd/controllers"
-	"main/cmd/models"
-	"main/cmd/utils"
 	"net/http"
 	"os"
 )

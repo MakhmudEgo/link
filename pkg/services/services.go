@@ -1,7 +1,7 @@
 package services
 
 import (
-	"main/cmd/models"
+	"link/pkg/models"
 	"math/rand"
 	"net/http"
 	"time"
